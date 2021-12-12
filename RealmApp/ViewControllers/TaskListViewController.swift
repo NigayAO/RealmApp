@@ -41,11 +41,10 @@ class TaskListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskListCell", for: indexPath)
-        var content = cell.defaultContentConfiguration()
         let taskList = chooseList(for: indexPath)
-        
+        var content = cell.defaultContentConfiguration()
         content.text = taskList.name
-        content.secondaryText = checkBox(for: indexPath)
+        content.secondaryText = checkMark(for: indexPath)
         cell.contentConfiguration = content
         return cell
     }
@@ -82,7 +81,7 @@ class TaskListViewController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard let indexPath = tableView.indexPathForSelectedRow else { return }
         guard let tasksVC = segue.destination as? TasksViewController else { return }
-        let taskList = taskLists[indexPath.row]
+        let taskList = chooseList(for: indexPath)
         tasksVC.taskList = taskList
     }
 
@@ -100,13 +99,13 @@ class TaskListViewController: UITableViewController {
         showAlert()
     }
     
-    func createTempData() {
+    private func createTempData() {
         DataManager.shared.createTempData {
             self.tableView.reloadData()
         }
     }
     
-    private func checkBox(for indexPath: IndexPath) -> String {
+    private func checkMark(for indexPath: IndexPath) -> String {
         let taskList = taskLists[indexPath.row].tasks
         let currentTasks = taskList.filter("isComplete = false")
         let completeTasks = taskList.filter("isComplete = true")

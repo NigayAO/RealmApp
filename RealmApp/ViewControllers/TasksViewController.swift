@@ -51,13 +51,15 @@ class TasksViewController: UITableViewController {
         }
         let done = UIContextualAction(style: .normal, title: "Done") { _, _, isDone in
             StorageManager.shared.done(task)
-            
             tableView.reloadData()
             isDone(true)
         }
+        
         done.title = indexPath.section == 0 ? "Done" : "Undone"
         done.backgroundColor = indexPath.section == 0 ? #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1) : #colorLiteral(red: 0.501960814, green: 0.501960814, blue: 0.501960814, alpha: 1)
+        
         edit.backgroundColor = .orange
+        
         return UISwipeActionsConfiguration(actions: [delete, edit, done])
     }
     
