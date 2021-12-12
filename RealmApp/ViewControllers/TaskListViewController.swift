@@ -42,17 +42,17 @@ class TaskListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskListCell", for: indexPath)
         var content = cell.defaultContentConfiguration()
-        let taskList = isSorted == false ? taskLists[indexPath.row] : sortedLists[indexPath.row]
+        let taskList = chooseList(for: indexPath)
         
         content.text = taskList.name
-        content.secondaryText = "\(taskList.tasks.count)"
+        content.secondaryText = checkBox(for: indexPath)
         cell.contentConfiguration = content
         return cell
     }
     
     // MARK: - Table View Data Source
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let taskList = taskLists[indexPath.row]
+        let taskList = chooseList(for: indexPath)
         
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { _, _, _ in
             StorageManager.shared.delete(taskList)
@@ -92,7 +92,6 @@ class TaskListViewController: UITableViewController {
                 first.name < second.name
             })
         }
-        print(sortedLists)
         isSorted = !isSorted
         tableView.reloadData()
     }
@@ -106,8 +105,21 @@ class TaskListViewController: UITableViewController {
             self.tableView.reloadData()
         }
     }
+    
+    private func checkBox(for indexPath: IndexPath) -> String {
+        let taskList = taskLists[indexPath.row].tasks
+        let currentTasks = taskList.filter("isComplete = false")
+        let completeTasks = taskList.filter("isComplete = true")
+        let check = completeTasks.count == taskList.count ? "✓" : "\(currentTasks.count)"
+        return check
+    }
+    
+    private func chooseList(for indexPath: IndexPath) -> TaskList {
+        isSorted == false ? taskLists[indexPath.row] : sortedLists[indexPath.row]
+    }
 }
 
+//MARK: - AlertControllers
 extension TaskListViewController {
     
     private func showAlert(with taskList: TaskList? = nil, completion: (() -> Void)? = nil) {

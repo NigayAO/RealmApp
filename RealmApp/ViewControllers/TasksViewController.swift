@@ -36,7 +36,8 @@ class TasksViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let task = taskList.tasks[indexPath.row]
+        
+        let task = indexPath.section == 0 ? currentTasks[indexPath.row] : completedTasks[indexPath.row]
         
         let delete = UIContextualAction(style: .destructive, title: "Delete") { _, _, _ in
             StorageManager.shared.delete(task, from: self.taskList, by: indexPath)
@@ -50,12 +51,12 @@ class TasksViewController: UITableViewController {
         }
         let done = UIContextualAction(style: .normal, title: "Done") { _, _, isDone in
             StorageManager.shared.done(task)
+            
             tableView.reloadData()
-            tableView.reloadRows(at: [indexPath], with: .automatic)
             isDone(true)
         }
-        done.title = task.isComplete == true ? "Undone" : "Done"
-        done.backgroundColor = task.isComplete == true ? .gray : .systemGreen
+        done.title = indexPath.section == 0 ? "Done" : "Undone"
+        done.backgroundColor = indexPath.section == 0 ? #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1) : #colorLiteral(red: 0.501960814, green: 0.501960814, blue: 0.501960814, alpha: 1)
         edit.backgroundColor = .orange
         return UISwipeActionsConfiguration(actions: [delete, edit, done])
     }
@@ -81,7 +82,6 @@ class TasksViewController: UITableViewController {
     @objc private func addButtonPressed() {
         showAlert()
     }
-
 }
 
 extension TasksViewController {
@@ -98,7 +98,6 @@ extension TasksViewController {
                 self.saveTask(withName: newValue, andNote: note)
             }
         }
-        
         present(alert, animated: true)
     }
     
