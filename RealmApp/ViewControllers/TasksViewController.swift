@@ -51,7 +51,13 @@ class TasksViewController: UITableViewController {
         }
         let done = UIContextualAction(style: .normal, title: "Done") { _, _, isDone in
             StorageManager.shared.done(task)
-            tableView.reloadData()
+            tableView.beginUpdates()
+            if indexPath.section == 0 {
+                tableView.moveRow(at: indexPath, to: IndexPath(row: self.completedTasks.count - 1, section: 1))
+            } else {
+                tableView.moveRow(at: indexPath, to: IndexPath(row: self.currentTasks.count - 1, section: 0))
+            }
+            tableView.endUpdates()
             isDone(true)
         }
         
@@ -59,6 +65,8 @@ class TasksViewController: UITableViewController {
         done.backgroundColor = indexPath.section == 0 ? #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1) : #colorLiteral(red: 0.501960814, green: 0.501960814, blue: 0.501960814, alpha: 1)
         
         edit.backgroundColor = .orange
+        
+        print("Row - \(indexPath.row), Section - \(indexPath.section)")
         
         return UISwipeActionsConfiguration(actions: [delete, edit, done])
     }
@@ -80,6 +88,16 @@ class TasksViewController: UITableViewController {
         cell.contentConfiguration = content
         return cell
     }
+    
+//    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+//        true
+//    }
+//
+//    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+//        tableView.beginUpdates()
+//        tableView.moveRow(at: sourceIndexPath, to: destinationIndexPath)
+//        tableView.endUpdates()
+//    }
     
     @objc private func addButtonPressed() {
         showAlert()
